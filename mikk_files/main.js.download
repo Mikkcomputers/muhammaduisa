@@ -1,0 +1,120 @@
+/**
+ * MIKK COMPUTERS - Client-Side Interactive Logic
+ */
+
+document.addEventListener('DOMContentLoaded', () => {
+  // 1. Mobile Menu Drawer
+  const mobileToggle = document.getElementById('mobileToggle');
+  const mobileDrawer = document.getElementById('mobileDrawer');
+  const drawerOverlay = document.getElementById('drawerOverlay');
+  const drawerClose = document.getElementById('drawerClose');
+
+  function openDrawer() {
+    mobileDrawer?.classList.add('active');
+    drawerOverlay?.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDrawer() {
+    mobileDrawer?.classList.remove('active');
+    drawerOverlay?.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  mobileToggle?.addEventListener('click', openDrawer);
+  drawerClose?.addEventListener('click', closeDrawer);
+  drawerOverlay?.addEventListener('click', closeDrawer);
+
+  // 2. Sticky Header & Back to Top Scroll
+  const mainHeader = document.getElementById('mainHeader');
+  const backToTop = document.getElementById('backToTop');
+
+  window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY;
+    if (scrollY > 100) {
+      mainHeader?.classList.add('scrolled');
+      backToTop?.classList.add('active');
+    } else {
+      mainHeader?.classList.remove('scrolled');
+      backToTop?.classList.remove('active');
+    }
+  });
+
+  backToTop?.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // 3. FAQ Accordion Functionality
+  const faqItems = document.querySelectorAll('.faq-accordion-item');
+  faqItems.forEach(item => {
+    const btn = item.querySelector('.faq-question-btn');
+    const panel = item.querySelector('.faq-answer-panel');
+
+    btn?.addEventListener('click', () => {
+      const isOpen = item.classList.contains('active');
+      // Close other accordions in the same container
+      const container = item.closest('.faq-accordion-container');
+      if (container) {
+        container.querySelectorAll('.faq-accordion-item').forEach(other => {
+          other.classList.remove('active');
+          const otherPanel = other.querySelector('.faq-answer-panel');
+          if (otherPanel) otherPanel.style.display = 'none';
+        });
+      }
+
+      if (!isOpen && panel) {
+        item.classList.add('active');
+        panel.style.display = 'block';
+      }
+    });
+  });
+
+  // 4. Global Screenshot Lightbox Modal
+  const lightboxModal = document.getElementById('lightboxModal');
+  const lightboxImg = document.getElementById('lightboxImg');
+  const lightboxCaption = document.getElementById('lightboxCaption');
+  const lightboxClose = document.getElementById('lightboxClose');
+
+  document.querySelectorAll('.lightbox-trigger').forEach(trigger => {
+    trigger.addEventListener('click', () => {
+      const src = trigger.getAttribute('data-img') || trigger.getAttribute('src');
+      const caption = trigger.getAttribute('data-caption') || trigger.getAttribute('alt') || '';
+      if (lightboxImg && lightboxModal) {
+        lightboxImg.src = src;
+        if (lightboxCaption) lightboxCaption.textContent = caption;
+        lightboxModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    });
+  });
+
+  function closeLightbox() {
+    if (lightboxModal) {
+      lightboxModal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  }
+
+  lightboxClose?.addEventListener('click', closeLightbox);
+  lightboxModal?.addEventListener('click', (e) => {
+    if (e.target === lightboxModal) {
+      closeLightbox();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeLightbox();
+      closeDrawer();
+    }
+  });
+
+  // 5. Auto dismiss flash alerts
+  setTimeout(() => {
+    document.querySelectorAll('.flash-container .alert').forEach(alert => {
+      alert.style.transition = 'opacity 0.5s ease';
+      alert.style.opacity = '0';
+      setTimeout(() => alert.remove(), 500);
+    });
+  }, 6000);
+});
